@@ -5,19 +5,26 @@ const { JWT_SECRET } = require("../secrets");
 const User = require("./auth-model");
 const { checkUserNameExists, validateFields } = require("./auth-middleware");
 
-router.post("/register", checkUserNameExists, validateFields, (req, res, next) => {
-      let user = req.body
+router.post(
+  "/register",
+  validateFields,
+  checkUserNameExists,
+  (req, res, next) => {
+    // const { username, password } = req.body;
+    // if (!username || !password || username === undefined || password === undefined) {
+    //   res.status(400).json({ message: "username and password required" })
+    // } else {
+      let user = req.body;
       const hash = bcrypt.hashSync(user.password, 6);
-      user.password = hash
+      user.password = hash;
       User.add(user)
-      .then(saved => {
-        res.status(201).json(saved)
-      })
-      .catch(next)
-    
-  }
-  );
-    /*
+        .then((saved) => {
+          res.status(201).json(saved);
+        })
+        .catch(next);
+      // }
+  });
+/*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -43,20 +50,18 @@ router.post("/register", checkUserNameExists, validateFields, (req, res, next) =
       the response body should include a string exactly as follows: "username taken".
   */
 
-
 router.post("/login", validateFields, async (req, res, next) => {
-  let { username, password } = req.body
+  let { username, password } = req.body;
 
-  User.findBy({ username })
-  .then(([user]) => {
+  User.findBy({ username }).then(([user]) => {
     if (user && bcrypt.compareSync(password, user.password)) {
-      console.log(user)
-      const token = buildToken(user)
-      res.status(200).json({message: `welcome, ${username}`, token})
+      console.log(user);
+      const token = buildToken(user);
+      res.status(200).json({ message: `welcome, ${username}`, token });
     } else {
-      next({ status: 404, message: "invalid credentials"})
+      next({ status: 404, message: "invalid credentials" });
     }
-  })
+  });
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -90,12 +95,11 @@ function buildToken(user) {
   const payload = {
     subject: user.id,
     username: user.username,
-  }
+  };
   const options = {
-    expiresIn: '1d',
-  }
-  return jwt.sign(payload, JWT_SECRET, options)
+    expiresIn: "1d",
+  };
+  return jwt.sign(payload, JWT_SECRET, options);
 }
-
 
 module.exports = router;
