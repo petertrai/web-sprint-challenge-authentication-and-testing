@@ -5,22 +5,18 @@ const { JWT_SECRET } = require("../secrets");
 const User = require("./auth-model");
 const { checkUserNameExists, validateFields } = require("./auth-middleware");
 
-router.post(
-  "/register",
-  checkUserNameExists,
-  validateFields,
-  async (req, res, next) => {
-    try {
-      const hash = bcrypt.hashSync(req.body.password, 6);
-      const result = await User.add({
-        username: req.body.username,
-        password: hash,
-      });
-      res.status(201).json(result);
-    } catch (err) {
-      next(err);
-    }
-
+router.post("/register", checkUserNameExists, validateFields, async (req, res, next) => {
+      let user = req.body
+      const hash = bcrypt.hashSync(user.password, 6);
+      user.password = hash
+      User.add(user)
+      .then(saved => {
+        res.status(201).json(saved)
+      })
+      .catch(next)
+    
+  }
+  );
     /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -46,8 +42,7 @@ router.post(
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-  }
-);
+
 
 router.post("/login", validateFields, async (req, res, next) => {
   let { username, password } = req.body
