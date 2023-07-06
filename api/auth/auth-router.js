@@ -49,7 +49,7 @@ router.post(
   }
 );
 
-router.post("/login", validateFields, (req, res, next) => {
+router.post("/login", validateFields, async (req, res, next) => {
   let { username, password } = req.body
 
   User.findBy({ username })

@@ -1,4 +1,5 @@
-// Write your tests here
-test('sanity', () => {
-  expect(true).toBe(true)
-})
+// const db = require('../data/dbConfig')
+// const request = require("supertest")
+// test('sanity', () => {
+//   expect(true).toBe(true)
+// })
