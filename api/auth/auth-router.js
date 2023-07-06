@@ -1,21 +1,27 @@
-const router = require('express').Router();
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { JWT_SECRET } = require("../secrets")
-const User = require('./auth-model')
+const router = require("express").Router();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../secrets");
+const User = require("./auth-model");
+const { checkUserNameExists, validateFields } = require("./auth-middleware");
 
-router.post('/register', async (req, res, next) => {
-  try {
-    let user = req.body
-    const hash = bcrypt.hashSync(user.password, 6)
-    const result = await User.add({username: req.body.username, password: hash})
-    res.status(201).json(result)
-  } catch(err) {
-    next(err)
-  }
-  
-  
-  /*
+router.post(
+  "/register",
+  checkUserNameExists,
+  validateFields,
+  async (req, res, next) => {
+    try {
+      const hash = bcrypt.hashSync(req.body.password, 6);
+      const result = await User.add({
+        username: req.body.username,
+        password: hash,
+      });
+      res.status(201).json(result);
+    } catch (err) {
+      next(err);
+    }
+
+    /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -40,10 +46,11 @@ router.post('/register', async (req, res, next) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
+  }
+);
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post("/login", (req, res) => {
+  res.end("implement login, please!");
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
